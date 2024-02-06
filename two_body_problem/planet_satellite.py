@@ -22,7 +22,7 @@ def f(t, y):
     dry_dt = vy
     drz_dt = vz
 
-    return np.array([drx_dt, dry_dt, drz_dt, dvx_dt, dvy_dt, dvz_dt])
+    return np.array([dvx_dt, dvy_dt, dvz_dt, drx_dt, dry_dt, drz_dt])
 
 t_span = np.array([0, 100*60])
 #times = np.linspace(t_span[0], t_span[1], 101)
