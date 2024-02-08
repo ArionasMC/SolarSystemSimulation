@@ -26,17 +26,26 @@ def f(t, y):
 
     return np.array([drx_dt, dry_dt, drz_dt, dvx_dt, dvy_dt, dvz_dt])
 
-r0_norm = radius + 450.0 # km
-T = 2*pi*sqrt((r0_norm**3)/mu) # seconds
+#r0_norm = radius + 600.0 # km
+T_new = 24*60*60 # 1 day in seconds
+R_new = ((mu*T_new**2)/(4*pi**2))**(1/3)
+
+print("R_new=",R_new)
+
+
+#T = 2*pi*sqrt((r0_norm**3)/mu) # seconds
 c = 10
 times_per_T = 30
-t_span = np.array([0, c*T])
+t_span = np.array([0, c*T_new])
 times = np.linspace(t_span[0], t_span[1], times_per_T*c)
 
-v0_norm = sqrt(mu/radius) # velocity for circular motion
-y0 = np.array([r0_norm, 0, 0, 0, v0_norm, 0])
+v0_norm = sqrt(mu/R_new) # velocity for circular motion
 
-sol = solve_ivp(f, t_span, y0, t_eval=times)
+print(v0_norm)
+
+y0 = np.array([R_new, 0, 0, 0, v0_norm, 0])
+
+sol = solve_ivp(f, t_span, y0, t_eval=times, method='LSODA')
 t = sol.t
 rx = sol.y[0]
 ry = sol.y[1]
@@ -45,10 +54,10 @@ vx = sol.y[3]
 vy = sol.y[4]
 vz = sol.y[5]
 
-print(T)
+#print(T)
 
 # plot of answer
-fig, ax = plt.subplots(6,1,sharex=True)
+fig, ax = plt.subplots(7,1,sharex=True)
 ax[0].plot(t, vx, 'r-', label='velocity x')
 ax[0].set_ylabel('vx (m/s)')
 ax[0].legend()
@@ -71,4 +80,6 @@ ax[5].plot(t, rz, 'g-', label='position z')
 ax[5].plot([t[0], t[-1]], [0,0], 'k--')
 ax[5].set_ylabel('rz (m)')
 ax[5].legend()
+
+ax[6].plot(rx, ry)
 plt.show()
