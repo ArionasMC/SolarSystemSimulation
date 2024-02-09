@@ -69,7 +69,7 @@ def get_cyclic_initial_values(c=10):
     T_new = 24*60*60 # 1 day in seconds
     R_new = ((mu*T_new**2)/(4*pi**2))**(1/3)
 
-    print("R_new=",R_new)
+    print("R_new =",R_new)
 
     #T = 2*pi*sqrt((r0_norm**3)/mu) # seconds
     #c = 100
@@ -79,12 +79,18 @@ def get_cyclic_initial_values(c=10):
 
     v0_norm = sqrt(mu/R_new) # velocity for circular motion
 
-    print(v0_norm)
+    print("v0_norm =",v0_norm)
 
     y0 = np.array([R_new, 0, 0, 0, v0_norm, 0])
 
+    # test calculate orbital period
+    energy = 0.5*v0_norm**2 - mu/R_new
+    a = -2*energy/mu
+    orbital_T = 2*pi*sqrt((a**3)/mu)
+    print("Orbital Period =",orbital_T)
+
     return t_span, times, y0
 
-t_span, times, y0 = get_cyclic_initial_values()
+t_span, times, y0 = get_cyclic_initial_values(c=1)
 sol = get_solution(t_span=t_span, y0=y0, times=times)
 graph_solution(sol)
