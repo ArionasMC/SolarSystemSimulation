@@ -107,7 +107,7 @@ def get_general_initial_values(r0, v0, c=10, times_per_T=30):
     
     return t_span, times, y0
 
-def test_solution():
+def test_solution(graph=True):
     #t_span, times, y0 = get_cyclic_initial_values(c=1)
 
     h = 600 # km
@@ -118,6 +118,6 @@ def test_solution():
 
     t_span, times, y0 = get_general_initial_values(r0=r0, v0=v0, c=5, times_per_T=50)
     sol = get_solution(t_span=t_span, y0=y0, times=times)
-    graph_solution(sol)
+    if(graph): graph_solution(sol)
 
 #test_solution()

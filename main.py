@@ -2,47 +2,47 @@ from ursina import *
 from ursina.shaders import lit_with_shadows_shader
 from ursina.prefabs.first_person_controller import FirstPersonController
 from core.celestial_body import CelestialBody
+from two_body_problem.planet_satellite import *
+import numpy as np
 
 app = Ursina()
 
 camera = FirstPersonController(gravity=0, z=-3, y=-2)
 
-sun = CelestialBody("Sun", mass=100.0, model="sphere", color=color.yellow, scale=2, shader=lit_with_shadows_shader)
-light = PointLight(parent=sun, color=color.white)
-light.position = (0, 0, 0)
+earth = CelestialBody("Earth", mass=100.0, model="sphere", color=color.blue, scale=1, shader=lit_with_shadows_shader)
+satellite = CelestialBody("Satellite", mass=0.1, model="sphere", color=color.gray, scale=0.1, shader=lit_with_shadows_shader)
 
-planet = CelestialBody("Planet 1", mass=0.1, model="sphere", color=color.blue, scale=0.5, shader=lit_with_shadows_shader)
-planet.position = (-2,0,0)
-planet.velocity = [0,0,0] #it works, must set otherwise sun moves too (?!!??!)
-planet.acceleration = [0,0,0]
+TEST_SCALE = radius
+h = 600 #km
+r0 = np.array([radius+h, 0, 0])
+satellite.position = r0/TEST_SCALE
+print(r0/TEST_SCALE)
+
+v_cyclic = sqrt(mu/r0[0]) # velocity for circular motion
+v0 = np.array([0, v_cyclic, 0])
+
+times_per_T = 50
+t_span, times, y0 = get_general_initial_values(r0=r0, v0=v0, c=1, times_per_T=times_per_T)
+sol = get_solution(t_span=t_span, y0=y0, times=times)
+#graph_solution(sol)
+print("sol len =",len(sol.y[0]),len(sol.y[1]),len(sol.y[2]))
+
+index = 0
 
 speed_y = 2
-bodies = [sun, planet]
+bodies = [earth, satellite]
 
 for body in bodies:
-    print(body.name, body.acceleration)
-
-def calculate_gravity(body1, body2):
-    dx = body2.x - body1.x
-    dy = body2.y - body1.y
-    distance = math.sqrt(dx**2 + dy**2)
-    force = 6.67430e-11 * (body1.mass * body2.mass) / distance**2
-    angle = math.atan2(dy, dx)
-    fx = force * math.cos(angle)
-    fy = force * math.sin(angle)
-    return fx, fy
-
-
+    print(body.name, body.position)
 
 def update():
+    global index
     camera.y += held_keys['space'] * time.dt * speed_y
     camera.y -= held_keys['shift'] * time.dt * speed_y
 
-    for body in bodies:
-        body.update_vectors()
-
-    fx, fz = calculate_gravity(sun, planet)
-    planet.acceleration = (fx, 0, fz)
+    satellite.position = np.array([sol.y[0][index], sol.y[2][index], sol.y[1][index]])/TEST_SCALE
+    index += 1
+    index %= times_per_T
 
 def input(key):
     #print(key)
