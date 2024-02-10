@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 from math import pi, sqrt
 
+# Earth values
 radius = 6378.0 # km
 mu = 3.986E+05 # km^3/s^2
 
@@ -26,8 +27,8 @@ def f(t, y):
 
     return np.array([drx_dt, dry_dt, drz_dt, dvx_dt, dvy_dt, dvz_dt])
 
-def get_solution(t_span, y0, times):
-    return solve_ivp(f, t_span, y0, t_eval=times, method='Radau')
+def get_solution(t_span, y0, times, method='Radau'):
+    return solve_ivp(f, t_span, y0, t_eval=times, method=method)
 
 def graph_solution(solution):
     t = solution.t
@@ -69,6 +70,7 @@ def get_cyclic_initial_values(c=10):
     T_new = 24*60*60 # 1 day in seconds
     R_new = ((mu*T_new**2)/(4*pi**2))**(1/3)
 
+    print("T_new =",T_new)
     print("R_new =",R_new)
 
     #T = 2*pi*sqrt((r0_norm**3)/mu) # seconds
@@ -85,12 +87,37 @@ def get_cyclic_initial_values(c=10):
 
     # test calculate orbital period
     energy = 0.5*v0_norm**2 - mu/R_new
-    a = -2*energy/mu
+    a = -mu/(2*energy)
     orbital_T = 2*pi*sqrt((a**3)/mu)
-    print("Orbital Period =",orbital_T)
+    print("orbital_T =",orbital_T)
 
     return t_span, times, y0
 
-t_span, times, y0 = get_cyclic_initial_values(c=1)
-sol = get_solution(t_span=t_span, y0=y0, times=times)
-graph_solution(sol)
+def get_general_initial_values(r0, v0, c=10, times_per_T=30):
+    r0_norm = np.linalg.norm(r0)
+    v0_norm = np.linalg.norm(v0)
+
+    energy = 0.5*v0_norm**2 - mu/r0_norm
+    a = -mu/(2*energy)
+    T = 2*pi*sqrt((a**3)/mu)
+
+    t_span = np.array([0, c*T])
+    times = np.linspace(t_span[0], t_span[1], times_per_T*c)
+    y0 = np.array([r0[0], r0[1], r0[2], v0[0], v0[1], v0[2]])
+    
+    return t_span, times, y0
+
+def test_solution():
+    #t_span, times, y0 = get_cyclic_initial_values(c=1)
+
+    h = 600 # km
+    r0 = np.array([radius+h, 0, 0])
+
+    v_cyclic = sqrt(mu/r0[0]) # velocity for circular motion
+    v0 = np.array([0, 3, 0])
+
+    t_span, times, y0 = get_general_initial_values(r0=r0, v0=v0, c=5, times_per_T=50)
+    sol = get_solution(t_span=t_span, y0=y0, times=times)
+    graph_solution(sol)
+
+#test_solution()
