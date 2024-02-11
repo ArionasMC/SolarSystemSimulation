@@ -99,6 +99,7 @@ def get_general_initial_values(r0, v0, c=10, times_per_T=30):
 
     energy = 0.5*v0_norm**2 - mu/r0_norm
     a = -mu/(2*energy)
+    print("a =",a)
     T = 2*pi*sqrt((a**3)/mu)
 
     t_span = np.array([0, c*T])
@@ -114,10 +115,15 @@ def test_solution(graph=True):
     r0 = np.array([radius+h, 0, 0])
 
     v_cyclic = sqrt(mu/r0[0]) # velocity for circular motion
-    v0 = np.array([0, 3, 0])
+    print("v_cyclic =",v_cyclic)
+    v_escape = sqrt(2*mu/r0[0]) # escape velocity
+    print("v_escape =",v_escape)
+
+    v0 = np.array([0, v_escape-0.001, 0])
 
     t_span, times, y0 = get_general_initial_values(r0=r0, v0=v0, c=5, times_per_T=50)
     sol = get_solution(t_span=t_span, y0=y0, times=times)
-    if(graph): graph_solution(sol)
+    if(graph): 
+        graph_solution(sol)
 
 #test_solution()

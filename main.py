@@ -19,10 +19,12 @@ satellite.position = r0/TEST_SCALE
 print(r0/TEST_SCALE)
 
 v_cyclic = sqrt(mu/r0[0]) # velocity for circular motion
-v0 = np.array([0, v_cyclic, 0])
+v_escape = sqrt(2*mu/r0[0]) # escape velocity
+v0 = np.array([0, v_escape-0.5, 0])
 
 times_per_T = 50
-t_span, times, y0 = get_general_initial_values(r0=r0, v0=v0, c=1, times_per_T=times_per_T)
+c = 10
+t_span, times, y0 = get_general_initial_values(r0=r0, v0=v0, c=c, times_per_T=times_per_T)
 sol = get_solution(t_span=t_span, y0=y0, times=times)
 #graph_solution(sol)
 print("sol len =",len(sol.y[0]),len(sol.y[1]),len(sol.y[2]))
@@ -42,7 +44,7 @@ def update():
 
     satellite.position = np.array([sol.y[0][index], sol.y[2][index], sol.y[1][index]])/TEST_SCALE
     index += 1
-    index %= times_per_T
+    index %= c*times_per_T
 
 def input(key):
     #print(key)
