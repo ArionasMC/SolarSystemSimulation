@@ -24,12 +24,7 @@ def f(t, y):
     dr1_dt = y1[3:6] # v1 vector
     dr2_dt = y2[3:6] # v2 vector
     
-    result = np.array([])
-    result = np.append(result, dr1_dt)
-    result = np.append(result, dv1_dt)
-    result = np.append(result, dr2_dt)
-    result = np.append(result, dv2_dt)
-    
+    result = np.concatenate((dr1_dt, dv1_dt, dr2_dt, dv2_dt))
     return result
 
 PLOT_NAMES = ('position x', 'position y', 'position z',
