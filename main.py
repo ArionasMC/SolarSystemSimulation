@@ -20,7 +20,7 @@ print(r0/TEST_SCALE)
 
 v_cyclic = sqrt(mu/r0[0]) # velocity for circular motion
 v_escape = sqrt(2*mu/r0[0]) # escape velocity
-v0 = np.array([0, v_escape-0.5, 0])
+v0 = np.array([0, v_escape*0.8, 0])
 
 times_per_T = 50
 c = 10
